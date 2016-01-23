@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	bson "gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -186,8 +187,13 @@ func visitModelNode(model interface{}, included *map[string]*Node, sideload bool
 				if ok {
 					node.Id = strconv.Itoa(j)
 				} else {
-					er = ErrBadJSONAPIID
-					break
+					o, ok := id.(bson.ObjectId)
+					if ok {
+						node.Id = o.Hex()
+					} else {
+						er = ErrBadJSONAPIID
+						break
+					}
 				}
 			}
 
